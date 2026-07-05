@@ -1,0 +1,43 @@
+=== build start: Mon Jul  6 01:49:07 HKT 2026 ===
+
+> receipt-app@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.5
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./app/page.js
+183:39  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+240:233  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/5) ...
+   Generating static pages (1/5) 
+   Generating static pages (2/5) 
+   Generating static pages (3/5) 
+ ✓ Generating static pages (5/5)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    191 kB          278 kB
+├ ○ /_not-found                          875 B          88.1 kB
+└ ƒ /api/vision                          0 B                0 B
++ First Load JS shared by all            87.2 kB
+  ├ chunks/23-dee0bc9af96cee87.js        31.5 kB
+  ├ chunks/fd9d1056-dd161187184bf178.js  53.7 kB
+  └ other shared chunks (total)          2.06 kB
+
+
+ƒ Middleware                             26.7 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+=== build exit code: 0 ===
+=== git start: Mon Jul  6 01:49:13 HKT 2026 ===

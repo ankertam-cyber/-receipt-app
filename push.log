@@ -1,2 +1,24 @@
 === git start: Mon Jul  6 01:01:53 HKT 2026 ===
 Initialized empty Git repository in /Users/ankernono/Next/receipt-app/.git/
+[main (root-commit) b4a0ac1] Rebuild: Next.js 智能單據與報銷系統 (from scratch)
+ 16 files changed, 6934 insertions(+)
+ create mode 100644 .eslintrc.json
+ create mode 100644 .gitignore
+ create mode 100644 app/api/vision/route.js
+ create mode 100644 app/globals.css
+ create mode 100644 app/layout.js
+ create mode 100644 app/page.js
+ create mode 100644 jsconfig.json
+ create mode 100644 next.config.js
+ create mode 100644 package-lock.json
+ create mode 100644 package.json
+ create mode 100644 postcss.config.js
+ create mode 100755 push.command
+ create mode 100644 push.log
+ create mode 100755 setup.command
+ create mode 100644 setup.log
+ create mode 100644 tailwind.config.js
+error: No such remote: 'origin'
+To https://github.com/ankertam-cyber/-receipt-app.git
+ + ea98568...b4a0ac1 main -> main (forced update)
+=== git push exit code: 0 ===
