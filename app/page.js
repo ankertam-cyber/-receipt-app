@@ -52,15 +52,36 @@ export default function Home() {
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
   });
+  const compressImage = (file) => new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+      const img = new Image();
+      img.src = e.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1600;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+          else { width = Math.round(width * MAX / height); height = MAX; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+    };
+  });
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) return showMessage('error', '請上傳圖片。');
-    if (file.size > 5 * 1024 * 1024) return showMessage('error', '圖片不能超過 5MB。');
+    if (file.size > 20 * 1024 * 1024) return showMessage('error', '圖片不能超過 20MB。');
     setIsUploading(true);
     setMessage({ type: '', text: '' });
     try {
-      const base64Full = await fileToBase64(file);
+      const base64Full = await compressImage(file);
 
       if (receipts.some(r => r.base64Image === base64Full)) {
         throw new Error("圖片已存在列表中，已攔截重複上傳。");
@@ -68,7 +89,7 @@ export default function Home() {
       const res = await fetch('/api/vision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ base64Image: base64Full, mimeType: file.type })
+        body: JSON.stringify({ base64Image: base64Full, mimeType: 'image/jpeg' })
       });
       const parsed = await res.json();
       if (!res.ok) throw new Error(parsed.error || "解析失敗");
