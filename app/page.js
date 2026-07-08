@@ -25,7 +25,7 @@ export default function Home() {
         const stored = await localforage.getItem('receipts');
         if (stored && Array.isArray(stored)) {
           const normalized = stored.map(r => ({ ...r, project: r.project || "", category: r.category || "未分類" }));
-          setReceipts(normalized.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+          setReceipts(normalized.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         }
       } catch (err) {
         showMessage('error', '無法讀取本地資料。');
@@ -39,7 +39,7 @@ export default function Home() {
   };
   const saveData = async (newData) => {
     try {
-      const sorted = [...newData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      const sorted = [...newData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       await localforage.setItem('receipts', sorted);
       setReceipts(sorted);
     } catch (err) {
@@ -52,15 +52,17 @@ export default function Home() {
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
   });
-  const compressImage = (file) => new Promise((resolve) => {
+  const compressImage = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
+    reader.onerror = reject;
     reader.onload = (e) => {
       const img = new Image();
       img.src = e.target.result;
+      img.onerror = reject;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX = 1600;
+        const MAX = 1024;
         let { width, height } = img;
         if (width > MAX || height > MAX) {
           if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
@@ -69,7 +71,7 @@ export default function Home() {
         canvas.width = width;
         canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.85));
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
       };
     };
   });
@@ -92,15 +94,22 @@ export default function Home() {
         body: JSON.stringify({ base64Image: base64Full, mimeType: 'image/jpeg' })
       });
       const parsed = await res.json();
-      if (!res.ok) throw new Error(parsed.error || "解析失敗");
-      const newDate = parsed.date || new Date().toISOString().split('T')[0];
+      if (!res.ok) throw new Error(parsed.details || parsed.error || "解析失敗");
+      // Validate receipt date: must be YYYY-MM-DD format; fall back to upload date only if null/invalid
+      const isValidDate = (d) => d && /^\d{4}-\d{2}-\d{2}$/.test(d) && !isNaN(new Date(d).getTime());
+      const newDate = isValidDate(parsed.date) ? parsed.date : (() => {
+        // Try to coerce non-standard format (e.g. "09/07/2026" → parse → reformat)
+        const attempt = parsed.date ? new Date(parsed.date) : null;
+        return (attempt && !isNaN(attempt.getTime())) ? attempt.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+      })();
       const newMerchant = parsed.merchant || "未辨識商家";
       const newAmount = Number(parsed.amount) || 0;
       if (receipts.some(r => r.date === newDate && r.merchant === newMerchant && r.amount === newAmount)) {
         throw new Error(`發現重複單據：${newDate} 於 ${newMerchant} 消費 $${newAmount}。`);
       }
       const newReceipt = {
-        id: crypto.randomUUID(), date: newDate, project: parsed.project || "",
+        id: crypto.randomUUID(), date: newDate, uploadedAt: new Date().toISOString(),
+        project: parsed.project || "",
         category: parsed.category || "未分類", merchant: newMerchant, amount: newAmount, base64Image: base64Full,
       };
       await saveData([...receipts, newReceipt]);
