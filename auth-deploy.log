@@ -41,3 +41,11 @@ Route (app)                              Size     First Load JS
 
 === build exit code: 0 ===
 === git start: Mon Jul  6 01:49:13 HKT 2026 ===
+[main b4c44a3] Add simple password protection (Basic Auth middleware)
+ 4 files changed, 106 insertions(+)
+ create mode 100755 auth-deploy.command
+ create mode 100644 auth-deploy.log
+ create mode 100644 middleware.js
+To https://github.com/ankertam-cyber/-receipt-app.git
+   b4a0ac1..b4c44a3  main -> main
+=== git push exit code: 0 ===

@@ -25,7 +25,7 @@ export default function Home() {
         const stored = await localforage.getItem('receipts');
         if (stored && Array.isArray(stored)) {
           const normalized = stored.map(r => ({ ...r, project: r.project || "", category: r.category || "未分類" }));
-          setReceipts(normalized.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+          setReceipts(normalized.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
         }
       } catch (err) {
         showMessage('error', '無法讀取本地資料。');
@@ -39,7 +39,7 @@ export default function Home() {
   };
   const saveData = async (newData) => {
     try {
-      const sorted = [...newData].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const sorted = [...newData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       await localforage.setItem('receipts', sorted);
       setReceipts(sorted);
     } catch (err) {
