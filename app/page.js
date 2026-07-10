@@ -95,6 +95,7 @@ export default function Home() {
       });
       const parsed = await res.json();
       if (!res.ok) throw new Error(parsed.details || parsed.error || "解析失敗");
+      const apiWarning = parsed._warning || null;
       // Validate receipt date: must be YYYY-MM-DD format; fall back to upload date only if null/invalid
       const isValidDate = (d) => d && /^\d{4}-\d{2}-\d{2}$/.test(d) && !isNaN(new Date(d).getTime());
       const newDate = isValidDate(parsed.date) ? parsed.date : (() => {
@@ -113,7 +114,11 @@ export default function Home() {
         category: parsed.category || "未分類", merchant: newMerchant, amount: newAmount, base64Image: base64Full,
       };
       await saveData([...receipts, newReceipt]);
-      showMessage('success', '✅ 單據解析成功！');
+      if (apiWarning) {
+        showMessage('error', `⚠️ ${apiWarning}，請點擊 ✏️ 修改日期及金額。`);
+      } else {
+        showMessage('success', '✅ 單據解析成功！');
+      }
     } catch (err) {
       showMessage('error', err.message);
     } finally {
